@@ -1,4 +1,4 @@
-const CACHE_NAME = 'loan-app-v2';
+const CACHE_NAME = 'loan-app-v3';
 const LOCAL_FILES = [
   './',
   './index.html',
