@@ -1,0 +1,21 @@
+{
+  "name": "مدیریت اقساط وام",
+  "short_name": "اقساط وام",
+  "description": "مدیریت و پیگیری اقساط وام‌ها با تاریخ شمسی",
+  "start_url": "./",
+  "scope": "./",
+  "display": "standalone",
+  "orientation": "portrait",
+  "background_color": "#f0f4f8",
+  "theme_color": "#3b82f6",
+  "lang": "fa",
+  "dir": "rtl",
+  "icons": [
+    {
+      "src": "icon.svg",
+      "sizes": "any",
+      "type": "image/svg+xml",
+      "purpose": "any maskable"
+    }
+  ]
+}

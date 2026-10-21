@@ -1,0 +1,546 @@
+<!DOCTYPE html>
+<html lang="fa" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>مدیریت اقساط وام - موبایل</title>
+	<meta name="theme-color" content="#3b82f6">
+<link rel="manifest" href="manifest.json">
+<link rel="apple-touch-icon" href="icon.svg">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="اقساط وام">
+    <script src="https://cdn.jsdelivr.net/npm/jalaali-js@1.2.6/dist/jalaali.js"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Vazirmatn:wght@100;300;400;500;700;900&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --primary: #3b82f6;
+            --primary-dark: #1d4ed8;
+            --primary-light: #dbeafe;
+            --success: #10b981;
+            --success-light: #d1fae5;
+            --warning: #f59e0b;
+            --warning-light: #fef3c7;
+            --danger: #ef4444;
+            --danger-light: #fee2e2;
+            --bg: #f0f4f8;
+            --card-bg: #ffffff;
+            --text: #1e293b;
+            --text-muted: #64748b;
+            --border: #e2e8f0;
+            --shadow: 0 4px 6px -1px rgba(0,0,0,0.1), 0 2px 4px -1px rgba(0,0,0,0.06);
+            --shadow-lg: 0 10px 15px -3px rgba(0,0,0,0.1), 0 4px 6px -2px rgba(0,0,0,0.05);
+            --radius: 16px;
+            --radius-sm: 10px;
+            --transition: 0.2s ease;
+        }
+
+        * { margin: 0; padding: 0; box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+
+        body {
+            font-family: 'Vazirmatn', sans-serif;
+            background: var(--bg);
+            color: var(--text);
+            line-height: 1.7;
+            min-height: 100vh;
+            padding-bottom: 30px;
+            font-size: 17px;
+        }
+
+        .header {
+            background: linear-gradient(135deg, #1e40af 0%, #3b82f6 50%, #60a5fa 100%);
+            color: #fff;
+            padding: 28px 18px 50px;
+            text-align: center;
+            position: relative;
+            overflow: hidden;
+            border-radius: 0 0 30px 30px;
+        }
+        .header::before {
+            content: '';
+            position: absolute;
+            top: -50%; left: -50%;
+            width: 200%; height: 200%;
+            background: radial-gradient(circle, rgba(255,255,255,0.08) 0%, transparent 60%);
+            animation: headerGlow 8s ease-in-out infinite;
+        }
+        @keyframes headerGlow { 0%,100% { transform: translate(0,0); } 50% { transform: translate(5%,3%); } }
+        .header-content { position: relative; z-index: 1; max-width: 600px; margin: 0 auto; }
+        .header-icon { font-size: 48px; margin-bottom: 8px; display: block; }
+        .header h1 { font-size: 1.9rem; font-weight: 900; letter-spacing: -0.5px; text-shadow: 0 2px 4px rgba(0,0,0,0.2); }
+        .header p { font-size: 1.05rem; opacity: 0.9; margin-top: 6px; font-weight: 300; }
+
+        .container { max-width: 520px; margin: -28px auto 0; padding: 0 14px; position: relative; z-index: 2; }
+
+        .stats-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-bottom: 22px; }
+        .stat-card {
+            background: var(--card-bg); border-radius: var(--radius); padding: 16px 14px;
+            box-shadow: var(--shadow); display: flex; align-items: center; gap: 12px;
+            transition: var(--transition); border: 1px solid var(--border);
+        }
+        .stat-card:active { transform: scale(0.97); }
+        .stat-icon { width: 46px; height: 46px; border-radius: 12px; display: flex; align-items: center; justify-content: center; font-size: 24px; flex-shrink: 0; }
+        .stat-icon.blue { background: var(--primary-light); color: var(--primary); }
+        .stat-icon.green { background: var(--success-light); color: var(--success); }
+        .stat-icon.amber { background: var(--warning-light); color: var(--warning); }
+        .stat-icon.red { background: var(--danger-light); color: var(--danger); }
+        .stat-icon.purple { background: #ede9fe; color: #8b5cf6; }
+        .stat-info span { font-size: 0.8rem; color: var(--text-muted); font-weight: 400; display: block; line-height: 1.3; }
+        .stat-info .stat-value { font-size: 1.15rem; font-weight: 800; color: var(--text); line-height: 1.4; }
+
+        .card { background: var(--card-bg); border-radius: var(--radius); padding: 20px 16px; box-shadow: var(--shadow); margin-bottom: 22px; border: 1px solid var(--border); }
+        .card-header { display: flex; align-items: center; justify-content: space-between; gap: 10px; margin-bottom: 18px; padding-bottom: 14px; border-bottom: 2px solid var(--bg); flex-wrap: wrap; }
+        .card-header h2 { font-size: 1.3rem; font-weight: 800; display: flex; align-items: center; gap: 8px; }
+
+        .header-btns { display: flex; gap: 8px; flex-wrap: wrap; }
+        .btn-add-loan { background: var(--success); color: #fff; border: none; padding: 12px 18px; border-radius: var(--radius-sm); font-family: inherit; font-size: 0.95rem; font-weight: 700; cursor: pointer; transition: var(--transition); display: flex; align-items: center; gap: 6px; box-shadow: 0 4px 12px rgba(16,185,129,0.3); -webkit-tap-highlight-color: transparent; min-height: 44px; }
+        .btn-add-loan:active { transform: scale(0.96); background: #059669; }
+        .btn-backup { background: var(--primary); color: #fff; border: none; padding: 12px 16px; border-radius: var(--radius-sm); font-family: inherit; font-size: 0.9rem; font-weight: 700; cursor: pointer; transition: var(--transition); display: flex; align-items: center; gap: 6px; -webkit-tap-highlight-color: transparent; min-height: 44px; }
+        .btn-backup:active { transform: scale(0.96); background: var(--primary-dark); }
+        .btn-restore { background: var(--warning); color: #fff; border: none; padding: 12px 16px; border-radius: var(--radius-sm); font-family: inherit; font-size: 0.9rem; font-weight: 700; cursor: pointer; transition: var(--transition); display: flex; align-items: center; gap: 6px; -webkit-tap-highlight-color: transparent; min-height: 44px; }
+        .btn-restore:active { transform: scale(0.96); background: #d97706; }
+        .btn-undo-delete { background: #8b5cf6; color: #fff; border: none; padding: 12px 16px; border-radius: var(--radius-sm); font-family: inherit; font-size: 0.9rem; font-weight: 700; cursor: pointer; transition: var(--transition); display: none; align-items: center; gap: 6px; -webkit-tap-highlight-color: transparent; min-height: 44px; }
+        .btn-undo-delete:active { transform: scale(0.96); background: #7c3aed; }
+        .btn-undo-delete.active { display: flex; }
+        .btn-reset-all { background: var(--danger); color: #fff; border: none; padding: 12px 16px; border-radius: var(--radius-sm); font-family: inherit; font-size: 0.9rem; font-weight: 700; cursor: pointer; transition: var(--transition); display: flex; align-items: center; gap: 6px; -webkit-tap-highlight-color: transparent; min-height: 44px; }
+        .btn-reset-all:active { transform: scale(0.96); background: #dc2626; }
+
+        .search-bar { display: flex; gap: 10px; margin-bottom: 16px; flex-wrap: wrap; align-items: center; }
+        .search-bar input { flex: 1; min-width: 0; padding: 14px 18px; border: 2px solid var(--border); border-radius: var(--radius-sm); font-family: inherit; font-size: 1.05rem; outline: none; transition: var(--transition); background: #fafbfc; min-height: 52px; }
+        .search-bar input:focus { border-color: var(--primary); background: #fff; box-shadow: 0 0 0 3px rgba(59,130,246,0.15); }
+
+        .loan-cards-container { display: flex; flex-direction: column; gap: 14px; }
+        .loan-card { background: var(--card-bg); border-radius: var(--radius); padding: 18px 16px; box-shadow: var(--shadow); border: 1px solid var(--border); transition: var(--transition); position: relative; }
+        .loan-card:active { transform: scale(0.98); }
+        .loan-card.completed { border-right: 5px solid var(--success); background: #f0fdf4; }
+        .loan-card:not(.completed) { border-right: 5px solid var(--primary); }
+        .loan-card-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 14px; flex-wrap: wrap; gap: 10px; }
+        .loan-card-name { font-weight: 800; font-size: 1.25rem; display: flex; align-items: center; gap: 8px; }
+        .loan-card-name .loan-icon { font-size: 1.5rem; }
+        .loan-card-badge { padding: 5px 14px; border-radius: 18px; font-size: 0.85rem; font-weight: 700; }
+        .loan-card-badge.complete { background: var(--success-light); color: #065f46; }
+        .loan-card-badge.progress { background: var(--primary-light); color: var(--primary-dark); }
+        .loan-card-progress { margin-bottom: 14px; }
+        .loan-card-progress .progress-header { display: flex; justify-content: space-between; font-size: 0.9rem; color: var(--text-muted); margin-bottom: 6px; font-weight: 500; }
+        .loan-card-progress .progress-bar { height: 10px; background: #e2e8f0; border-radius: 10px; overflow: hidden; }
+        .loan-card-progress .progress-bar .fill { height: 100%; background: linear-gradient(90deg, #3b82f6, #60a5fa); border-radius: 10px; transition: width 0.4s ease; }
+        .loan-card-progress .progress-bar .fill.complete { background: linear-gradient(90deg, #10b981, #34d399); }
+        .loan-card-progress .progress-bar .fill.high { background: linear-gradient(90deg, #f59e0b, #fbbf24); }
+        .loan-card-details { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-bottom: 14px; }
+        .loan-detail-item { display: flex; flex-direction: column; gap: 3px; }
+        .loan-detail-label { font-size: 0.8rem; color: var(--text-muted); font-weight: 500; }
+        .loan-detail-value { font-size: 1rem; font-weight: 700; }
+        .loan-detail-value.amount { color: #1e40af; }
+        .loan-detail-value.paid { color: var(--success); }
+        .loan-detail-value.remain { color: var(--warning); }
+        .loan-detail-value.remain.zero { color: var(--success); }
+
+        /* ====== BUTTONS ORDERLY ====== */
+        .loan-card-actions {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 10px;
+            padding-top: 14px;
+            border-top: 1px solid var(--border);
+        }
+        .loan-card-actions .btn-action {
+            width: 100%;
+            justify-content: center;
+            padding: 12px 10px;
+            font-size: 0.9rem;
+            gap: 6px;
+            min-height: 44px;
+            border-radius: var(--radius-sm);
+            font-family: inherit;
+            font-weight: 700;
+            border: none;
+            cursor: pointer;
+            transition: var(--transition);
+            display: flex;
+            align-items: center;
+            -webkit-tap-highlight-color: transparent;
+        }
+        .loan-card-actions .btn-action:active { transform: scale(0.95); }
+        .btn-action.pay { background: var(--success-light); color: var(--success); }
+        .btn-action.pay:active { background: var(--success); color: #fff; }
+        .btn-action.edit { background: var(--primary-light); color: var(--primary); }
+        .btn-action.edit:active { background: var(--primary); color: #fff; }
+        .btn-action.delete { background: var(--danger-light); color: var(--danger); }
+        .btn-action.delete:active { background: var(--danger); color: #fff; }
+        .btn-action.undo-pay { background: #fef3c7; color: #b45309; display: none; }
+        .btn-action.undo-pay:active { background: #f59e0b; color: #fff; }
+        .btn-action.undo-pay.active { display: flex; }
+
+        .empty-state { text-align: center; padding: 50px 20px; color: var(--text-muted); }
+        .empty-state .empty-icon { font-size: 60px; display: block; margin-bottom: 16px; }
+        .empty-state h3 { font-size: 1.3rem; font-weight: 700; margin-bottom: 6px; color: var(--text); }
+        .empty-state p { font-size: 1rem; }
+
+        .modal-overlay { position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: rgba(0,0,0,0.6); z-index: 1000; display: none; align-items: flex-end; justify-content: center; animation: fadeInOverlay 0.25s ease; }
+        .modal-overlay.active { display: flex; }
+        @keyframes fadeInOverlay { from { opacity: 0; } to { opacity: 1; } }
+        .modal-content { background: var(--card-bg); border-radius: 20px 20px 0 0; width: 100%; max-width: 520px; max-height: 90vh; overflow-y: auto; padding: 24px 18px 20px; animation: slideUpModal 0.3s ease; -webkit-overflow-scrolling: touch; }
+        @keyframes slideUpModal { from { transform: translateY(100%); } to { transform: translateY(0); } }
+        .modal-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; padding-bottom: 16px; border-bottom: 2px solid var(--bg); }
+        .modal-header h2 { font-size: 1.35rem; font-weight: 800; display: flex; align-items: center; gap: 8px; }
+        .modal-header h2 .badge-edit { font-size: 0.75rem; background: var(--warning-light); color: var(--warning); padding: 3px 10px; border-radius: 18px; font-weight: 600; display: none; }
+        .modal-header h2 .badge-edit.active { display: inline-block; }
+        .btn-close-modal { width: 40px; height: 40px; border-radius: 50%; border: none; background: var(--bg); color: var(--text); font-size: 22px; cursor: pointer; display: flex; align-items: center; justify-content: center; transition: var(--transition); -webkit-tap-highlight-color: transparent; }
+        .btn-close-modal:active { transform: scale(0.9); background: #e2e8f0; }
+        .modal-body { padding-bottom: 10px; }
+
+        .form-grid { display: flex; flex-direction: column; gap: 16px; }
+        .form-group { display: flex; flex-direction: column; gap: 6px; }
+        .form-group label { font-size: 0.95rem; font-weight: 600; color: var(--text-muted); display: flex; align-items: center; gap: 6px; }
+        .form-group input { padding: 14px 16px; border: 2px solid var(--border); border-radius: var(--radius-sm); font-family: inherit; font-size: 1.1rem; transition: var(--transition); background: #fafbfc; color: var(--text); outline: none; width: 100%; -webkit-appearance: none; appearance: none; min-height: 54px; }
+        .form-group input:focus { border-color: var(--primary); background: #fff; box-shadow: 0 0 0 3px rgba(59,130,246,0.15); }
+        .form-group input.error { border-color: var(--danger); box-shadow: 0 0 0 3px rgba(239,68,68,0.12); }
+        .form-group .hint { font-size: 0.8rem; color: var(--text-muted); font-weight: 300; }
+        .form-group .input-with-btn { display: flex; gap: 8px; align-items: center; }
+        .form-group .input-with-btn input { flex: 1; }
+        .form-group .input-with-btn .btn-icon-calc { width: 54px; height: 54px; border-radius: var(--radius-sm); border: 2px solid var(--border); background: var(--primary-light); color: var(--primary); font-size: 24px; cursor: pointer; display: flex; align-items: center; justify-content: center; transition: var(--transition); flex-shrink: 0; }
+        .form-group .input-with-btn .btn-icon-calc:active { transform: scale(0.9); background: var(--primary); color: #fff; }
+
+        .form-actions { display: flex; flex-direction: column; gap: 10px; margin-top: 20px; }
+        .btn { padding: 16px 22px; border-radius: var(--radius-sm); font-family: inherit; font-size: 1.1rem; font-weight: 700; border: none; cursor: pointer; transition: var(--transition); display: flex; align-items: center; justify-content: center; gap: 8px; white-space: nowrap; min-height: 56px; width: 100%; -webkit-tap-highlight-color: transparent; }
+        .btn:active { transform: scale(0.97); }
+        .btn-primary { background: var(--primary); color: #fff; box-shadow: 0 4px 12px rgba(59,130,246,0.3); }
+        .btn-primary:hover { background: var(--primary-dark); }
+        .btn-secondary { background: var(--bg); color: var(--text); border: 2px solid var(--border); }
+        .btn-secondary:hover { background: #e2e8f0; }
+
+        .toast-container { position: fixed; bottom: 20px; right: 15px; left: 15px; z-index: 2000; display: flex; flex-direction: column; gap: 10px; pointer-events: none; }
+        .toast { padding: 16px 20px; border-radius: var(--radius-sm); color: #fff; font-weight: 600; font-size: 1rem; box-shadow: var(--shadow-lg); animation: slideInToast 0.35s ease, fadeOutToast 0.35s ease 2.6s forwards; display: flex; align-items: center; gap: 10px; font-family: inherit; pointer-events: auto; max-width: 100%; }
+        .toast.success { background: var(--success); }
+        .toast.error { background: var(--danger); }
+        .toast.warning { background: var(--warning); }
+        @keyframes slideInToast { from { transform: translateY(30px); opacity: 0; } to { transform: translateY(0); opacity: 1; } }
+        @keyframes fadeOutToast { to { opacity: 0; transform: translateY(-10px); } }
+
+        input[type="number"] { -moz-appearance: textfield; -webkit-appearance: none; appearance: none; }
+        input[type="number"]::-webkit-outer-spin-button, input[type="number"]::-webkit-inner-spin-button { -webkit-appearance: none; margin: 0; }
+        .modal-content::-webkit-scrollbar { width: 6px; }
+        .modal-content::-webkit-scrollbar-track { background: #f1f5f9; border-radius: 3px; }
+        .modal-content::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 3px; }
+
+        .file-input-wrapper { position: relative; overflow: hidden; display: inline-block; width: 100%; }
+        .file-input-wrapper input[type="file"] { position: absolute; left: 0; top: 0; opacity: 0; width: 100%; height: 100%; cursor: pointer; }
+        .file-input-label { display: flex; align-items: center; justify-content: center; gap: 8px; padding: 14px 20px; background: var(--primary-light); color: var(--primary-dark); border: 2px dashed var(--primary); border-radius: var(--radius-sm); font-size: 1rem; font-weight: 700; cursor: pointer; min-height: 54px; transition: var(--transition); }
+        .file-input-label:active { background: var(--primary); color: #fff; }
+
+        @media (min-width: 768px) {
+            .container { max-width: 750px; padding: 0 20px; }
+            .header { padding: 32px 20px 55px; }
+            .header h1 { font-size: 2.2rem; }
+            .header p { font-size: 1.15rem; }
+            .stats-grid { grid-template-columns: repeat(3, 1fr); gap: 16px; }
+            .loan-cards-container { display: grid; grid-template-columns: repeat(2, 1fr); gap: 16px; }
+            .loan-card { padding: 20px 18px; }
+            .card { padding: 24px 20px; }
+            .card-header h2 { font-size: 1.5rem; }
+            .header-btns .btn-add-loan, .header-btns .btn-backup, .header-btns .btn-restore, .header-btns .btn-undo-delete, .header-btns .btn-reset-all { padding: 12px 18px; font-size: 1rem; }
+            .form-actions { flex-direction: row; flex-wrap: wrap; gap: 12px; }
+            .form-actions .btn { flex: 1; min-width: 150px; }
+            .modal-content { max-width: 600px; border-radius: 20px; margin: 20px auto; align-self: center; }
+        }
+        @media (min-width: 1024px) {
+            .container { max-width: 1000px; }
+            .stats-grid { grid-template-columns: repeat(6, 1fr); }
+            .loan-cards-container { grid-template-columns: repeat(3, 1fr); }
+            .header h1 { font-size: 2.5rem; }
+        }
+    </style>
+</head>
+<body>
+
+    <header class="header">
+        <div class="header-content">
+            <span class="header-icon">🏦</span>
+            <h1>مدیریت اقساط وام</h1>
+            <p>پیگیری آسان اقساط • تاریخ شمسی</p>
+        </div>
+    </header>
+
+    <div class="container">
+        <div class="stats-grid" id="statsGrid">
+            <div class="stat-card"><div class="stat-icon blue">📋</div><div class="stat-info"><span>تعداد وام‌ها</span><div class="stat-value" id="statTotalLoans">۰</div></div></div>
+            <div class="stat-card"><div class="stat-icon green">💰</div><div class="stat-info"><span>مجموع مبلغ</span><div class="stat-value" id="statTotalAmount">۰ تومان</div></div></div>
+            <div class="stat-card"><div class="stat-icon amber">✅</div><div class="stat-info"><span>پرداخت شده</span><div class="stat-value" id="statTotalPaid">۰</div></div></div>
+            <div class="stat-card"><div class="stat-icon red">⏳</div><div class="stat-info"><span>باقی‌مانده</span><div class="stat-value" id="statTotalRemain">۰</div></div></div>
+            <div class="stat-card"><div class="stat-icon blue">📅</div><div class="stat-info"><span>مجموع اقساط ماهانه</span><div class="stat-value" id="statTotalMonthlyInstallments">۰ تومان</div></div></div>
+            <div class="stat-card"><div class="stat-icon purple">💳</div><div class="stat-info"><span>مجموع مانده وام‌ها</span><div class="stat-value" id="statTotalRemainingAmount">۰ تومان</div></div></div>
+        </div>
+
+        <div class="card">
+            <div class="card-header">
+                <h2>📊 لیست وام‌ها</h2>
+                <div class="header-btns">
+                    <button class="btn-undo-delete" id="btnUndoDelete">↩️ بازنشانی</button>
+                    <button class="btn-backup" id="btnBackup">💾 بکاپ</button>
+                    <button class="btn-restore" id="btnRestore">📂 بازگردانی</button>
+                    <button class="btn-add-loan" id="btnAddLoan">➕ افزودن</button>
+                    <button class="btn-reset-all" id="btnResetAll">🔄 ریست کامل</button>
+                </div>
+            </div>
+            <div class="search-bar">
+                <input type="text" id="searchInput" placeholder="🔍 جستجو بر اساس اسم وام...">
+            </div>
+            <div class="loan-cards-container" id="loanCardsContainer"></div>
+        </div>
+    </div>
+
+    <div class="modal-overlay" id="modalOverlay">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2>📝 <span id="formTitle">افزودن وام جدید</span><span class="badge-edit" id="editBadge">✏️ ویرایش</span></h2>
+                <button class="btn-close-modal" id="btnCloseModal">✕</button>
+            </div>
+            <div class="modal-body">
+                <form id="loanForm" novalidate>
+                    <div class="form-grid">
+                        <div class="form-group"><label for="loanName">🏷️ اسم وام *</label><input type="text" id="loanName" placeholder="مثلاً: وام مسکن" required></div>
+                        <div class="form-group"><label for="loanAmount">💵 مبلغ وام (تومان) *</label><input type="text" id="loanAmount" placeholder="50,000,000" inputmode="numeric" required></div>
+                        <div class="form-group"><label for="totalInstallments">📊 تعداد کل اقساط *</label><input type="text" id="totalInstallments" placeholder="مثلاً: 36" inputmode="numeric" required></div>
+                        <div class="form-group"><label for="paidInstallments">✅ تعداد پرداخت شده *</label><input type="text" id="paidInstallments" placeholder="مثلاً: 5" inputmode="numeric" required value="0"></div>
+                        <div class="form-group"><label for="paymentDay">📅 روز پرداخت (۱ تا ۳۱) *</label><input type="text" id="paymentDay" placeholder="مثلاً: ۱۵" inputmode="numeric" required></div>
+                        <div class="form-group"><label for="startDate">📆 تاریخ شروع (شمسی) *</label><input type="text" id="startDate" placeholder="1403/05/15" pattern="\d{4}/\d{2}/\d{2}" required></div>
+                        <div class="form-group">
+                            <label for="installmentAmount">💳 مبلغ هر قسط (تومان)</label>
+                            <div class="input-with-btn">
+                                <input type="text" id="installmentAmount" placeholder="دستی وارد کنید" inputmode="numeric">
+                                <button type="button" class="btn-icon-calc" id="autoCalcBtn">🧮</button>
+                            </div>
+                            <span class="hint">دستی یا با دکمه 🧮</span>
+                        </div>
+                        <div class="form-group">
+                            <label for="remainingAmount">⏳ مانده وام (تومان)</label>
+                            <div class="input-with-btn">
+                                <input type="text" id="remainingAmount" placeholder="مثلاً: 300,000,000" inputmode="numeric">
+                                <button type="button" class="btn-icon-calc" id="autoCalcRemainingBtn">🧮</button>
+                            </div>
+                            <span class="hint">دستی وارد کنید یا دکمه 🧮 را بزنید</span>
+                        </div>
+                        <div class="form-group">
+                            <label for="endDate">🏁 پایان اقساط (شمسی)</label>
+                            <div class="input-with-btn">
+                                <input type="text" id="endDate" placeholder="1406/02/15" pattern="\d{4}/\d{2}/\d{2}">
+                                <button type="button" class="btn-icon-calc" id="autoCalcEndDateBtn">🧮</button>
+                            </div>
+                            <span class="hint">دستی وارد کنید یا دکمه 🧮 را بزنید</span>
+                        </div>
+                    </div>
+                    <div class="form-actions">
+                        <button type="submit" class="btn btn-primary" id="submitBtn">➕ افزودن وام</button>
+                        <button type="button" class="btn btn-secondary" id="cancelEditBtn" style="display:none;">✖ لغو ویرایش</button>
+                        <button type="button" class="btn btn-secondary" id="resetFormBtn">🔄 پاک کردن فرم</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <div class="modal-overlay" id="restoreModalOverlay">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2>📂 بازگردانی بکاپ</h2>
+                <button class="btn-close-modal" id="btnCloseRestoreModal">✕</button>
+            </div>
+            <div class="modal-body">
+                <p style="margin-bottom: 16px; font-size: 1rem; color: var(--text-muted);">فایل بکاپ خود را انتخاب کنید:</p>
+                <div class="file-input-wrapper">
+                    <input type="file" id="restoreFileInput" accept=".json,application/json">
+                    <label for="restoreFileInput" class="file-input-label">📁 انتخاب فایل بکاپ</label>
+                </div>
+                <div id="fileInfo" style="margin-top: 12px; font-size: 0.9rem; color: var(--text-muted);"></div>
+                <div class="form-actions">
+                    <button type="button" class="btn btn-primary" id="btnConfirmRestore">📂 بازگردانی</button>
+                    <button type="button" class="btn btn-secondary" id="btnCancelRestore">✖ انصراف</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="toast-container" id="toastContainer"></div>
+
+    <script>
+        (function() {
+            const STORAGE_KEY = 'loanInstallmentsData_modal_v12';
+            const DELETED_LOAN_KEY = 'lastDeletedLoan';
+            let loans = [];
+            let editingId = null;
+            let lastDeletedLoan = null;
+            let selectedBackupFile = null;
+
+            function toJalali(gregorianDate) { const d = (gregorianDate instanceof Date) ? gregorianDate : new Date(gregorianDate); if (isNaN(d.getTime())) return null; const j = jalaali.toJalaali(d.getFullYear(), d.getMonth() + 1, d.getDate()); return `${j.jy}/${String(j.jm).padStart(2,'0')}/${String(j.jd).padStart(2,'0')}`; }
+            function toGregorian(jalaliDateStr) { const parts = jalaliDateStr.split('/'); if (parts.length !== 3) return null; const jy = parseInt(parts[0]); const jm = parseInt(parts[1]); const jd = parseInt(parts[2]); const g = jalaali.toGregorian(jy, jm, jd); if (!g) return null; return new Date(g.gy, g.gm - 1, g.gd); }
+            function isValidJalaliDate(str) { if (!/^\d{4}\/\d{2}\/\d{2}$/.test(str)) return false; const parts = str.split('/'); const jy = parseInt(parts[0]); const jm = parseInt(parts[1]); const jd = parseInt(parts[2]); if (jm < 1 || jm > 12 || jd < 1 || jd > 31) return false; const g = jalaali.toGregorian(jy, jm, jd); if (!g) return false; const back = jalaali.toJalaali(g.gy, g.gm, g.gd); return back.jy === jy && back.jm === jm && back.jd === jd; }
+            function addMonthsJalali(jalaliDateStr, months) { const g = toGregorian(jalaliDateStr); if (!g) return jalaliDateStr; g.setMonth(g.getMonth() + months); return toJalali(g); }
+            function calcEndDate(startDateJalali, totalInstallments, paymentDay) { const startG = toGregorian(startDateJalali); if (!startG || !totalInstallments || totalInstallments < 1) return ''; const endG = new Date(startG); endG.setMonth(endG.getMonth() + totalInstallments - 1); const year = endG.getFullYear(); const month = endG.getMonth(); const lastDay = new Date(year, month + 1, 0).getDate(); endG.setDate(Math.min(paymentDay, lastDay)); return toJalali(endG); }
+            function calcInstallmentAmount(amount, total) { if (!amount || !total || total <= 0) return 0; return Math.round(amount / total); }
+            function calcRemaining(total, paid) { return Math.max(0, total - paid); }
+            function calcProgress(paid, total) { if (total <= 0) return 0; return Math.min(100, Math.round((paid / total) * 100)); }
+            function formatNumber(num) { return Number(num || 0).toLocaleString('fa-IR'); }
+            function formatCurrency(num) { return formatNumber(num) + ' تومان'; }
+            function formatDateShamsi(dateStr) { if (!dateStr) return '—'; return dateStr; }
+            function addThousandSeparator(input) { let value = input.value.replace(/\D/g, ''); if (value === '') { input.value = ''; return; } const num = parseInt(value, 10); if (isNaN(num)) { input.value = ''; return; } input.value = num.toLocaleString('en-US'); }
+            function parseFormattedNumber(str) { if (!str) return 0; return parseInt(str.replace(/,/g, ''), 10) || 0; }
+            function showToast(message, type = 'success') { const container = document.getElementById('toastContainer'); const toast = document.createElement('div'); toast.className = `toast ${type}`; const icon = type === 'success' ? '✅' : type === 'error' ? '❌' : '⚠️'; toast.innerHTML = `${icon} ${message}`; container.appendChild(toast); setTimeout(() => { if (toast.parentNode) toast.remove(); }, 3000); }
+
+            const modalOverlay = document.getElementById('modalOverlay');
+            const btnAddLoan = document.getElementById('btnAddLoan');
+            const btnCloseModal = document.getElementById('btnCloseModal');
+            const btnBackup = document.getElementById('btnBackup');
+            const btnRestore = document.getElementById('btnRestore');
+            const btnUndoDelete = document.getElementById('btnUndoDelete');
+            const btnResetAll = document.getElementById('btnResetAll');
+            const restoreModalOverlay = document.getElementById('restoreModalOverlay');
+            const btnCloseRestoreModal = document.getElementById('btnCloseRestoreModal');
+            const btnConfirmRestore = document.getElementById('btnConfirmRestore');
+            const btnCancelRestore = document.getElementById('btnCancelRestore');
+            const restoreFileInput = document.getElementById('restoreFileInput');
+            const fileInfo = document.getElementById('fileInfo');
+            const loanForm = document.getElementById('loanForm');
+            const loanNameInput = document.getElementById('loanName');
+            const loanAmountInput = document.getElementById('loanAmount');
+            const totalInstallmentsInput = document.getElementById('totalInstallments');
+            const paidInstallmentsInput = document.getElementById('paidInstallments');
+            const paymentDayInput = document.getElementById('paymentDay');
+            const startDateInput = document.getElementById('startDate');
+            const installmentAmountInput = document.getElementById('installmentAmount');
+            const remainingAmountInput = document.getElementById('remainingAmount');
+            const endDateInput = document.getElementById('endDate');
+            const submitBtn = document.getElementById('submitBtn');
+            const cancelEditBtn = document.getElementById('cancelEditBtn');
+            const resetFormBtn = document.getElementById('resetFormBtn');
+            const autoCalcBtn = document.getElementById('autoCalcBtn');
+            const autoCalcEndDateBtn = document.getElementById('autoCalcEndDateBtn');
+            const autoCalcRemainingBtn = document.getElementById('autoCalcRemainingBtn');
+            const formTitle = document.getElementById('formTitle');
+            const editBadge = document.getElementById('editBadge');
+            const loanCardsContainer = document.getElementById('loanCardsContainer');
+            const searchInput = document.getElementById('searchInput');
+            const statTotalLoans = document.getElementById('statTotalLoans');
+            const statTotalAmount = document.getElementById('statTotalAmount');
+            const statTotalPaid = document.getElementById('statTotalPaid');
+            const statTotalRemain = document.getElementById('statTotalRemain');
+            const statTotalMonthlyInstallments = document.getElementById('statTotalMonthlyInstallments');
+            const statTotalRemainingAmount = document.getElementById('statTotalRemainingAmount');
+
+            function openModal() { modalOverlay.classList.add('active'); document.body.style.overflow = 'hidden'; }
+            function closeModal() { modalOverlay.classList.remove('active'); document.body.style.overflow = ''; resetForm(); }
+            btnAddLoan.addEventListener('click', () => { resetForm(); openModal(); });
+            btnCloseModal.addEventListener('click', closeModal);
+
+            function openRestoreModal() { restoreModalOverlay.classList.add('active'); document.body.style.overflow = 'hidden'; restoreFileInput.value = ''; selectedBackupFile = null; fileInfo.textContent = ''; }
+            function closeRestoreModal() { restoreModalOverlay.classList.remove('active'); document.body.style.overflow = ''; }
+            btnRestore.addEventListener('click', openRestoreModal);
+            btnCloseRestoreModal.addEventListener('click', closeRestoreModal);
+            btnCancelRestore.addEventListener('click', closeRestoreModal);
+
+            restoreFileInput.addEventListener('change', function(e) { const file = e.target.files[0]; if (file) { selectedBackupFile = file; fileInfo.textContent = `📄 فایل انتخاب شد: ${file.name} (${(file.size / 1024).toFixed(1)} کیلوبایت)`; } else { selectedBackupFile = null; fileInfo.textContent = ''; } });
+
+            function downloadBackupFile() { const backupData = JSON.stringify(loans, null, 2); const blob = new Blob([backupData], { type: 'application/json' }); const url = URL.createObjectURL(blob); const link = document.createElement('a'); const now = new Date(); const todayJalali = toJalali(now).replace(/\//g, '-'); link.href = url; link.download = `loan-backup-${todayJalali}.json`; document.body.appendChild(link); link.click(); document.body.removeChild(link); setTimeout(() => { URL.revokeObjectURL(url); }, 100); showToast('💾 فایل بکاپ با موفقیت دانلود شد!', 'success'); }
+            btnBackup.addEventListener('click', downloadBackupFile);
+
+            function handleRestoreFromFile() { if (!selectedBackupFile) { showToast('لطفاً ابتدا فایل بکاپ را انتخاب کنید!', 'error'); return; } const reader = new FileReader(); reader.onload = function(e) { try { const restoredLoans = JSON.parse(e.target.result); if (!Array.isArray(restoredLoans)) { showToast('فرمت فایل بکاپ نامعتبر است!', 'error'); return; } const isValid = restoredLoans.every(loan => loan.id && loan.name && loan.amount !== undefined && loan.totalInstallments !== undefined && loan.paidInstallments !== undefined); if (!isValid) { showToast('فرمت فایل بکاپ نامعتبر است!', 'error'); return; } if (confirm('آیا از بازگردانی بکاپ مطمئن هستید؟\nاطلاعات فعلی جایگزین می‌شود.')) { loans = restoredLoans; saveData(); renderLoanCards(); updateStats(); closeRestoreModal(); showToast('📂 بکاپ با موفقیت بازگردانی شد!', 'success'); } } catch (e) { showToast('فرمت فایل بکاپ نامعتبر است!', 'error'); } }; reader.onerror = function() { showToast('خطا در خواندن فایل!', 'error'); }; reader.readAsText(selectedBackupFile); }
+            btnConfirmRestore.addEventListener('click', handleRestoreFromFile);
+
+            function handleUndoDelete() { if (lastDeletedLoan) { loans.push(lastDeletedLoan); saveData(); renderLoanCards(); updateStats(); lastDeletedLoan = null; saveLastDeleted(); btnUndoDelete.classList.remove('active'); showToast('↩️ وام با موفقیت بازنشانی شد!', 'success'); } else { showToast('وام حذف شده‌ای برای بازنشانی وجود ندارد!', 'warning'); } }
+            btnUndoDelete.addEventListener('click', handleUndoDelete);
+
+            function handleResetAll() { if (confirm('⚠️ هشدار: تمام وام‌ها و اطلاعات به‌طور کامل پاک می‌شوند!\nاین عمل قابل بازگشت نیست.\n\nآیا مطمئن هستید؟')) { loans = []; lastDeletedLoan = null; saveData(); saveLastDeleted(); renderLoanCards(); updateStats(); btnUndoDelete.classList.remove('active'); showToast('🔄 تمام اطلاعات با موفقیت ریست شد!', 'warning'); } }
+            btnResetAll.addEventListener('click', handleResetAll);
+
+            function autoCalculateEndDate() { const startDate = startDateInput.value.trim(); const total = parseInt(totalInstallmentsInput.value) || 0; const payDay = parseInt(paymentDayInput.value) || 1; if (startDate && isValidJalaliDate(startDate) && total > 0 && payDay >= 1 && payDay <= 31) { endDateInput.value = calcEndDate(startDate, total, payDay); showToast('تاریخ پایان محاسبه شد', 'success'); } else { showToast('تاریخ شروع، تعداد اقساط و روز پرداخت را وارد کنید', 'warning'); } }
+            function autoCalculateInstallment() { const amount = parseFormattedNumber(loanAmountInput.value); const total = parseInt(totalInstallmentsInput.value) || 0; if (amount > 0 && total > 0) { const calcAmount = calcInstallmentAmount(amount, total); installmentAmountInput.value = calcAmount.toLocaleString('en-US'); showToast('مبلغ قسط محاسبه شد', 'success'); } else { showToast('مبلغ وام و تعداد اقساط را وارد کنید', 'warning'); } }
+            function autoCalculateRemaining() { const amount = parseFormattedNumber(loanAmountInput.value); const paid = parseInt(paidInstallmentsInput.value) || 0; const total = parseInt(totalInstallmentsInput.value) || 0; const installmentAmt = parseFormattedNumber(installmentAmountInput.value) || calcInstallmentAmount(amount, total); if (amount > 0 && total > 0) { const remaining = Math.max(0, amount - (paid * installmentAmt)); remainingAmountInput.value = remaining.toLocaleString('en-US'); showToast('مانده وام محاسبه شد', 'success'); } else { showToast('مبلغ وام و تعداد اقساط را وارد کنید', 'warning'); } }
+
+            loanAmountInput.addEventListener('input', function() { addThousandSeparator(this); });
+            installmentAmountInput.addEventListener('input', function() { addThousandSeparator(this); });
+            remainingAmountInput.addEventListener('input', function() { addThousandSeparator(this); });
+            autoCalcBtn.addEventListener('click', autoCalculateInstallment);
+            autoCalcEndDateBtn.addEventListener('click', autoCalculateEndDate);
+            autoCalcRemainingBtn.addEventListener('click', autoCalculateRemaining);
+
+            function resetForm() { loanForm.reset(); paidInstallmentsInput.value = '0'; installmentAmountInput.value = ''; remainingAmountInput.value = ''; endDateInput.value = ''; editingId = null; submitBtn.textContent = '➕ افزودن وام'; formTitle.textContent = 'افزودن وام جدید'; editBadge.classList.remove('active'); cancelEditBtn.style.display = 'none'; loanForm.querySelectorAll('.error').forEach(el => el.classList.remove('error')); }
+
+            function validateForm() { let isValid = true; const requiredFields = [loanNameInput, loanAmountInput, totalInstallmentsInput, paidInstallmentsInput, paymentDayInput, startDateInput]; requiredFields.forEach(field => { field.classList.remove('error'); if (!field.value || field.value.trim() === '') { field.classList.add('error'); isValid = false; } }); const amountVal = parseFormattedNumber(loanAmountInput.value); if (amountVal <= 0) { loanAmountInput.classList.add('error'); isValid = false; } const startDateVal = startDateInput.value.trim(); if (startDateVal && !isValidJalaliDate(startDateVal)) { startDateInput.classList.add('error'); isValid = false; showToast('تاریخ شروع شمسی معتبر نیست (مثال: 1403/05/15)', 'error'); } const endDateVal = endDateInput.value.trim(); if (endDateVal && !isValidJalaliDate(endDateVal)) { endDateInput.classList.add('error'); isValid = false; showToast('تاریخ پایان شمسی معتبر نیست (مثال: 1406/02/15)', 'error'); } const total = parseInt(totalInstallmentsInput.value) || 0; const paid = parseInt(paidInstallmentsInput.value) || 0; if (total > 0 && paid > total) { paidInstallmentsInput.classList.add('error'); isValid = false; showToast('تعداد پرداخت شده نمی‌تواند بیشتر از تعداد کل اقساط باشد!', 'error'); } const payDay = parseInt(paymentDayInput.value) || 0; if (payDay < 1 || payDay > 31) { paymentDayInput.classList.add('error'); isValid = false; showToast('روز پرداخت باید بین ۱ تا ۳۱ باشد!', 'error'); } return isValid; }
+
+            function handleFormSubmit(e) { e.preventDefault(); if (!validateForm()) { showToast('لطفاً فیلدهای الزامی را به درستی تکمیل کنید.', 'error'); return; } const amountVal = parseFormattedNumber(loanAmountInput.value); const installmentVal = parseFormattedNumber(installmentAmountInput.value); const remainingVal = parseFormattedNumber(remainingAmountInput.value); const endDateVal = endDateInput.value.trim(); const loanData = { name: loanNameInput.value.trim(), amount: amountVal, totalInstallments: parseInt(totalInstallmentsInput.value) || 0, paidInstallments: parseInt(paidInstallmentsInput.value) || 0, paymentDay: parseInt(paymentDayInput.value) || 1, startDate: startDateInput.value.trim(), endDate: endDateVal || calcEndDate(startDateInput.value.trim(), parseInt(totalInstallmentsInput.value) || 0, parseInt(paymentDayInput.value) || 1), paymentHistory: [] }; if (installmentVal > 0) { loanData.customInstallment = installmentVal; } else { loanData.customInstallment = null; } if (remainingVal > 0) { loanData.remainingAmount = remainingVal; } else { loanData.remainingAmount = null; } if (editingId !== null) { const index = loans.findIndex(l => l.id === editingId); if (index !== -1) { loanData.paymentHistory = loans[index].paymentHistory || []; loans[index] = { ...loans[index], ...loanData }; showToast('✅ وام با موفقیت به‌روزرسانی شد!', 'success'); } } else { loanData.id = Date.now(); loans.push(loanData); showToast('🎉 وام جدید با موفقیت اضافه شد!', 'success'); } saveData(); closeModal(); renderLoanCards(); updateStats(); }
+
+            function handleEdit(id) { const loan = loans.find(l => l.id === id); if (!loan) return; editingId = id; loanNameInput.value = loan.name; loanAmountInput.value = loan.amount.toLocaleString('en-US'); totalInstallmentsInput.value = loan.totalInstallments; paidInstallmentsInput.value = loan.paidInstallments; paymentDayInput.value = loan.paymentDay; startDateInput.value = loan.startDate; installmentAmountInput.value = (loan.customInstallment ? loan.customInstallment : calcInstallmentAmount(loan.amount, loan.totalInstallments)).toLocaleString('en-US'); remainingAmountInput.value = (loan.remainingAmount ? loan.remainingAmount : '').toLocaleString('en-US'); endDateInput.value = loan.endDate; submitBtn.textContent = '💾 به‌روزرسانی وام'; formTitle.textContent = 'ویرایش وام'; editBadge.classList.add('active'); cancelEditBtn.style.display = 'flex'; openModal(); }
+            function handleCancelEdit() { resetForm(); closeModal(); }
+
+            function handleDelete(id) { const loan = loans.find(l => l.id === id); if (!loan) return; const confirmMsg = `آیا از حذف وام «${loan.name}» مطمئن هستید؟\n\n💡 نکته: می‌توانید با دکمه «↩️ بازنشانی» این وام را دوباره برگردانید.`; if (confirm(confirmMsg)) { lastDeletedLoan = { ...loan }; saveLastDeleted(); loans = loans.filter(l => l.id !== id); saveData(); renderLoanCards(); updateStats(); btnUndoDelete.classList.add('active'); if (editingId === id) { resetForm(); } showToast('🗑️ وام حذف شد. با دکمه «بازنشانی» می‌توانید آن را برگردانید.', 'warning'); } }
+
+            function handlePayOne(id) { const loan = loans.find(l => l.id === id); if (!loan) return; if (loan.paidInstallments >= loan.totalInstallments) { showToast('این وام قبلاً به طور کامل پرداخت شده است!', 'warning'); return; } loan.paidInstallments += 1; const installmentAmt = loan.customInstallment || calcInstallmentAmount(loan.amount, loan.totalInstallments); if (loan.remainingAmount !== null && loan.remainingAmount !== undefined) { loan.remainingAmount = Math.max(0, loan.remainingAmount - installmentAmt); } else { const calculatedRemaining = Math.max(0, loan.amount - (loan.paidInstallments * installmentAmt)); loan.remainingAmount = calculatedRemaining; } if (!loan.paymentHistory) { loan.paymentHistory = []; } loan.paymentHistory.push({ date: toJalali(new Date()), amount: installmentAmt, installmentNumber: loan.paidInstallments }); loan.lastPaymentDate = toJalali(new Date()); saveData(); renderLoanCards(); updateStats(); if (loan.paidInstallments >= loan.totalInstallments) { showToast('🎊 تبریک! این وام به طور کامل پرداخت شد!', 'success'); } else { showToast(`✅ یک قسط پرداخت شد. (${loan.paidInstallments} از ${loan.totalInstallments})`, 'success'); } }
+
+            function handleUndoPay(id) { const loan = loans.find(l => l.id === id); if (!loan) return; if (loan.paidInstallments <= 0) { showToast('پرداختی برای برگشت وجود ندارد!', 'warning'); return; } loan.paidInstallments -= 1; const installmentAmt = loan.customInstallment || calcInstallmentAmount(loan.amount, loan.totalInstallments); if (loan.remainingAmount !== null && loan.remainingAmount !== undefined) { loan.remainingAmount = Math.min(loan.amount, loan.remainingAmount + installmentAmt); } else { loan.remainingAmount = Math.max(0, loan.amount - (loan.paidInstallments * installmentAmt)); } if (loan.paymentHistory && loan.paymentHistory.length > 0) { loan.paymentHistory.pop(); } if (loan.paymentHistory && loan.paymentHistory.length > 0) { loan.lastPaymentDate = loan.paymentHistory[loan.paymentHistory.length - 1].date; } else { loan.lastPaymentDate = null; } saveData(); renderLoanCards(); updateStats(); showToast('↩️ پرداخت قبلی برگشت خورد!', 'warning'); }
+
+            function renderLoanCards(filterText = '') { const filteredLoans = filterText.trim() ? loans.filter(l => l.name.includes(filterText.trim()) || l.name.toLowerCase().includes(filterText.trim().toLowerCase())) : loans; if (filteredLoans.length === 0) { loanCardsContainer.innerHTML = `<div class="empty-state"><span class="empty-icon">🏖️</span><h3>${loans.length === 0 ? 'هنوز وامی ثبت نشده است' : 'نتیجه‌ای یافت نشد'}</h3><p>${loans.length === 0 ? 'برای افزودن اولین وام خود، روی دکمه «افزودن» کلیک کنید.' : 'عبارت جستجو را تغییر دهید.'}</p></div>`; return; } let html = ''; filteredLoans.forEach((loan) => { const remaining = calcRemaining(loan.totalInstallments, loan.paidInstallments); const installmentAmt = loan.customInstallment || calcInstallmentAmount(loan.amount, loan.totalInstallments); const remainingAmount = loan.remainingAmount !== null && loan.remainingAmount !== undefined ? loan.remainingAmount : Math.max(0, loan.amount - (loan.paidInstallments * installmentAmt)); const progress = calcProgress(loan.paidInstallments, loan.totalInstallments); const isCompleted = loan.paidInstallments >= loan.totalInstallments; const cardClass = isCompleted ? 'completed' : ''; const progressFillClass = isCompleted ? 'complete' : progress > 80 ? 'high' : ''; const badgeClass = isCompleted ? 'complete' : 'progress'; const badgeText = isCompleted ? '✅ تکمیل' : '🔄 فعال'; const hasPayment = loan.paidInstallments > 0; const lastPaymentDate = loan.lastPaymentDate || (loan.paymentHistory && loan.paymentHistory.length > 0 ? loan.paymentHistory[loan.paymentHistory.length - 1].date : null); html += `
+                <div class="loan-card ${cardClass}">
+                    <div class="loan-card-header">
+                        <div class="loan-card-name"><span class="loan-icon">💳</span>${escapeHtml(loan.name)}</div>
+                        <span class="loan-card-badge ${badgeClass}">${badgeText}</span>
+                    </div>
+                    <div class="loan-card-progress">
+                        <div class="progress-header"><span>پیشرفت: ${formatNumber(progress)}٪</span><span>${formatNumber(loan.paidInstallments)} از ${formatNumber(loan.totalInstallments)}</span></div>
+                        <div class="progress-bar"><div class="fill ${progressFillClass}" style="width: ${progress}%"></div></div>
+                    </div>
+                    <div class="loan-card-details">
+                        <div class="loan-detail-item"><span class="loan-detail-label">💰 مبلغ وام</span><span class="loan-detail-value amount">${formatCurrency(loan.amount)}</span></div>
+                        <div class="loan-detail-item"><span class="loan-detail-label">💳 مبلغ هر قسط</span><span class="loan-detail-value">${formatCurrency(installmentAmt)}</span></div>
+                        <div class="loan-detail-item"><span class="loan-detail-label">✅ پرداخت شده</span><span class="loan-detail-value paid">${formatNumber(loan.paidInstallments)} قسط</span></div>
+                        <div class="loan-detail-item"><span class="loan-detail-label">⏳ باقی‌مانده</span><span class="loan-detail-value remain ${remaining === 0 ? 'zero' : ''}">${formatNumber(remaining)} قسط</span></div>
+                        <div class="loan-detail-item"><span class="loan-detail-label">📅 روز پرداخت</span><span class="loan-detail-value">${formatNumber(loan.paymentDay)}</span></div>
+                        <div class="loan-detail-item"><span class="loan-detail-label">🏁 پایان اقساط</span><span class="loan-detail-value">${formatDateShamsi(loan.endDate)}</span></div>
+                        <div class="loan-detail-item"><span class="loan-detail-label">💰 مانده وام</span><span class="loan-detail-value amount">${formatCurrency(remainingAmount)}</span></div>
+                        ${lastPaymentDate ? `<div class="loan-detail-item"><span class="loan-detail-label">📅 آخرین پرداخت</span><span class="loan-detail-value">${formatDateShamsi(lastPaymentDate)}</span></div>` : ''}
+                    </div>
+                    <div class="loan-card-actions">
+                        ${hasPayment ? `<button class="btn-action undo-pay active" onclick="handleUndoPay(${loan.id})">↩️ برگشت پرداخت</button>` : ''}
+                        <button class="btn-action pay" onclick="handlePayOne(${loan.id})">✅ پرداخت</button>
+                        <button class="btn-action edit" onclick="handleEdit(${loan.id})">✏️ ویرایش</button>
+                        <button class="btn-action delete" onclick="handleDelete(${loan.id})">🗑️ حذف</button>
+                    </div>
+                </div>
+            `; }); loanCardsContainer.innerHTML = html; }
+
+            function escapeHtml(str) { const div = document.createElement('div'); div.textContent = str; return div.innerHTML; }
+
+            function updateStats() { const totalLoans = loans.length; const totalAmount = loans.reduce((sum, l) => sum + l.amount, 0); const totalPaid = loans.reduce((sum, l) => sum + l.paidInstallments, 0); const totalRemain = loans.reduce((sum, l) => sum + calcRemaining(l.totalInstallments, l.paidInstallments), 0); const totalMonthlyInstallments = loans.reduce((sum, l) => { if (l.paidInstallments < l.totalInstallments) { const installmentAmt = l.customInstallment || calcInstallmentAmount(l.amount, l.totalInstallments); return sum + installmentAmt; } return sum; }, 0); const totalRemainingAmount = loans.reduce((sum, l) => { const installmentAmt = l.customInstallment || calcInstallmentAmount(l.amount, l.totalInstallments); const remainingAmount = (l.remainingAmount !== null && l.remainingAmount !== undefined) ? l.remainingAmount : Math.max(0, l.amount - (l.paidInstallments * installmentAmt)); return sum + remainingAmount; }, 0); statTotalLoans.textContent = formatNumber(totalLoans); statTotalAmount.textContent = formatCurrency(totalAmount); statTotalPaid.textContent = formatNumber(totalPaid); statTotalRemain.textContent = formatNumber(totalRemain); statTotalMonthlyInstallments.textContent = formatCurrency(totalMonthlyInstallments); statTotalRemainingAmount.textContent = formatCurrency(totalRemainingAmount); }
+
+            function loadData() { try { const stored = localStorage.getItem(STORAGE_KEY); if (stored) { loans = JSON.parse(stored); } else { loans = getSampleData(); saveData(); } } catch (e) { console.error('Error loading data:', e); loans = []; } }
+            function saveData() { try { localStorage.setItem(STORAGE_KEY, JSON.stringify(loans)); } catch (e) { console.error('Error saving data:', e); } }
+            function saveLastDeleted() { if (lastDeletedLoan) { localStorage.setItem(DELETED_LOAN_KEY, JSON.stringify(lastDeletedLoan)); } else { localStorage.removeItem(DELETED_LOAN_KEY); } }
+
+            function getSampleData() { const now = new Date(); const todayJalali = toJalali(now); const start1 = addMonthsJalali(todayJalali, -4); const start2 = addMonthsJalali(todayJalali, -10); const start3 = addMonthsJalali(todayJalali, -1); return [ { id: Date.now() - 300000, name: 'وام مسکن', amount: 800000000, totalInstallments: 60, paidInstallments: 4, paymentDay: 15, startDate: start1, endDate: calcEndDate(start1, 60, 15), customInstallment: null, remainingAmount: 746666667, paymentHistory: [], lastPaymentDate: null }, { id: Date.now() - 200000, name: 'وام خودرو', amount: 350000000, totalInstallments: 24, paidInstallments: 10, paymentDay: 5, startDate: start2, endDate: calcEndDate(start2, 24, 5), customInstallment: null, remainingAmount: 204166667, paymentHistory: [], lastPaymentDate: null }, { id: Date.now() - 100000, name: 'وام ازدواج', amount: 150000000, totalInstallments: 12, paidInstallments: 12, paymentDay: 20, startDate: start3, endDate: calcEndDate(start3, 12, 20), customInstallment: null, remainingAmount: 0, paymentHistory: [], lastPaymentDate: null } ]; }
+
+            loanForm.addEventListener('submit', handleFormSubmit);
+            cancelEditBtn.addEventListener('click', handleCancelEdit);
+            resetFormBtn.addEventListener('click', resetForm);
+            searchInput.addEventListener('input', (e) => renderLoanCards(e.target.value));
+
+            window.handleEdit = handleEdit;
+            window.handleDelete = handleDelete;
+            window.handlePayOne = handlePayOne;
+            window.handleUndoPay = handleUndoPay;
+
+            document.addEventListener('keydown', (e) => { if (e.key === 'Escape') { if (restoreModalOverlay.classList.contains('active')) { closeRestoreModal(); } if (modalOverlay.classList.contains('active')) { closeModal(); } } });
+
+            function init() { loadData(); renderLoanCards(); updateStats(); if (!startDateInput.value) { const today = new Date(); startDateInput.value = toJalali(today); } const savedDeleted = localStorage.getItem(DELETED_LOAN_KEY); if (savedDeleted) { try { lastDeletedLoan = JSON.parse(savedDeleted); if (lastDeletedLoan) { btnUndoDelete.classList.add('active'); } } catch (e) { lastDeletedLoan = null; } } }
+
+            init();
+        })();
+    </script>
+	<script>
+  if ('serviceWorker' in navigator) {
+    window.addEventListener('load', () => {
+      navigator.serviceWorker.register('sw.js')
+        .then(() => console.log('✅ Service Worker registered'))
+        .catch(err => console.log('❌ SW failed:', err));
+    });
+  }
+</script>
+</body>
+</html>
