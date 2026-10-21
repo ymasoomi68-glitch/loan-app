@@ -2,7 +2,7 @@
   "name": "مدیریت اقساط وام",
   "short_name": "اقساط وام",
   "description": "مدیریت و پیگیری اقساط وام‌ها با تاریخ شمسی",
-  "start_url": "./",
+  "start_url": "start.html",
   "scope": "./",
   "display": "standalone",
   "orientation": "portrait",
