@@ -2,11 +2,13 @@
 <html lang="fa" dir="rtl">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>مدیریت اقساط وام - موبایل</title>
 	<meta name="theme-color" content="#3b82f6">
 <link rel="manifest" href="manifest.webmanifest">
-<link rel="apple-touch-icon" href="icon.svg">
+<link rel="apple-touch-icon" href="apple-touch-icon.png">
+<link rel="icon" type="image/png" href="icon-192.png">
+<meta name="mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
 <meta name="apple-mobile-web-app-title" content="اقساط وام">
@@ -249,6 +251,18 @@
             .loan-cards-container { grid-template-columns: repeat(3, 1fr); }
             .header h1 { font-size: 2.5rem; }
         }
+
+        /* ===== دکمه نصب برنامه ===== */
+        .btn-install { margin-top: 16px; background: #fff; color: var(--primary-dark); border: none; padding: 13px 26px; border-radius: 999px; font-family: inherit; font-size: 1.05rem; font-weight: 800; cursor: pointer; display: inline-flex; align-items: center; justify-content: center; gap: 8px; min-height: 48px; box-shadow: 0 6px 18px rgba(0,0,0,0.22); transition: var(--transition); -webkit-tap-highlight-color: transparent; animation: installPulse 2.4s ease-in-out infinite; }
+        .btn-install[hidden] { display: none; }
+        .btn-install:active { transform: scale(0.96); }
+        @keyframes installPulse { 0%,100% { box-shadow: 0 6px 18px rgba(0,0,0,0.22), 0 0 0 0 rgba(255,255,255,0.55); } 50% { box-shadow: 0 6px 18px rgba(0,0,0,0.22), 0 0 0 10px rgba(255,255,255,0); } }
+        .install-steps { list-style: none; counter-reset: s; display: flex; flex-direction: column; gap: 12px; margin: 4px 0 14px; }
+        .install-steps li { counter-increment: s; display: flex; gap: 12px; align-items: flex-start; background: var(--bg); border-radius: var(--radius-sm); padding: 12px 14px; font-size: 1rem; }
+        .install-steps li::before { content: counter(s, persian); flex-shrink: 0; width: 28px; height: 28px; border-radius: 50%; background: var(--primary); color: #fff; font-weight: 800; display: flex; align-items: center; justify-content: center; font-size: 0.9rem; }
+        .install-note { font-size: 0.9rem; color: var(--text-muted); background: var(--warning-light); border-radius: var(--radius-sm); padding: 10px 14px; margin-bottom: 8px; }
+        .install-note[hidden] { display: none; }
+        @media (display-mode: standalone) { .btn-install { display: none; } }
     </style>
 </head>
 <body>
@@ -258,6 +272,7 @@
             <span class="header-icon">🏦</span>
             <h1>مدیریت اقساط وام</h1>
             <p>پیگیری آسان اقساط • تاریخ شمسی</p>
+            <button type="button" class="btn-install" id="btnInstall" hidden>📲 نصب برنامه روی دستگاه</button>
         </div>
     </header>
 
@@ -362,6 +377,17 @@
 
     <div class="toast-container" id="toastContainer"></div>
 
+
+    <div class="modal-overlay" id="installHelpOverlay" role="dialog" aria-modal="true" aria-labelledby="installHelpTitle">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2 id="installHelpTitle">📲 نصب برنامه</h2>
+                <button type="button" class="btn-close-modal" id="installHelpClose" aria-label="بستن">✕</button>
+            </div>
+            <div class="install-note" id="installInsecure" hidden>⚠️ نصب فقط روی آدرس امن (https://) کار می‌کند. برنامه را از یک آدرس https باز کنید، نه از فایل داخل گوشی یا کامپیوتر.</div>
+            <ol class="install-steps" id="installSteps"></ol>
+        </div>
+    </div>
     <script>
         (function() {
             const STORAGE_KEY = 'loanInstallmentsData_modal_v12';
@@ -541,6 +567,95 @@
         .catch(err => console.log('❌ SW failed:', err));
     });
   }
+</script>
+
+<script>
+(function () {
+  var btn = document.getElementById('btnInstall');
+  var overlay = document.getElementById('installHelpOverlay');
+  var stepsEl = document.getElementById('installSteps');
+  var insecure = document.getElementById('installInsecure');
+  var deferredPrompt = null;
+
+  var ua = navigator.userAgent || '';
+  var isIOS = /iphone|ipad|ipod/i.test(ua) || (/Macintosh/.test(ua) && navigator.maxTouchPoints > 1);
+  var isAndroid = /android/i.test(ua);
+  var isFirefox = /firefox|fxios/i.test(ua);
+  var isMacSafari = /Macintosh/.test(ua) && !isIOS && /Safari/.test(ua) && !/Chrome|Chromium|Edg/.test(ua);
+
+  function isInstalled() {
+    return window.matchMedia('(display-mode: standalone)').matches ||
+           window.matchMedia('(display-mode: window-controls-overlay)').matches ||
+           window.navigator.standalone === true;
+  }
+
+  function refresh() { btn.hidden = isInstalled(); }
+
+  function steps() {
+    if (isIOS) return [
+      'در Safari دکمه «اشتراک‌گذاری» (آیکون مربع با فلش رو به بالا ⬆️) را بزنید.',
+      'پایین بیایید و «افزودن به صفحه اصلی» (Add to Home Screen) را انتخاب کنید.',
+      'روی «افزودن» (Add) بزنید. برنامه روی صفحه اصلی گوشی نصب می‌شود.'
+    ];
+    if (isAndroid) return [
+      'منوی مرورگر (سه نقطه ⋮) را باز کنید.',
+      'گزینه «نصب برنامه» (Install app) یا «افزودن به صفحه اصلی» را بزنید.',
+      'نصب را تأیید کنید. آیکون برنامه روی صفحه اصلی ساخته می‌شود.'
+    ];
+    if (isMacSafari) return [
+      'از منوی بالای صفحه، File را باز کنید.',
+      'گزینه Add to Dock را بزنید.'
+    ];
+    if (isFirefox) return [
+      'فایرفاکس روی ویندوز از نصب برنامه پشتیبانی نمی‌کند.',
+      'این صفحه را در Microsoft Edge یا Google Chrome باز کنید و دوباره روی دکمه نصب بزنید.'
+    ];
+    return [
+      'در Edge یا Chrome، آیکون نصب را در سمت نوار آدرس بزنید (یا منوی ⋯ / ⋮ را باز کنید).',
+      'در Edge: Apps ← Install this site as an app. در Chrome: Cast, save and share ← Install page as app.',
+      'روی Install بزنید. برنامه در منوی Start و روی دسکتاپ ویندوز اضافه می‌شود.'
+    ];
+  }
+
+  function openHelp() {
+    stepsEl.innerHTML = '';
+    steps().forEach(function (t) { var li = document.createElement('li'); li.textContent = t; stepsEl.appendChild(li); });
+    insecure.hidden = window.isSecureContext !== false;
+    overlay.classList.add('active');
+  }
+  function closeHelp() { overlay.classList.remove('active'); }
+
+  window.addEventListener('beforeinstallprompt', function (e) {
+    e.preventDefault();
+    deferredPrompt = e;
+    refresh();
+  });
+
+  window.addEventListener('appinstalled', function () {
+    deferredPrompt = null;
+    btn.hidden = true;
+    closeHelp();
+  });
+
+  btn.addEventListener('click', function () {
+    if (deferredPrompt) {
+      var p = deferredPrompt;
+      deferredPrompt = null;
+      p.prompt();
+      p.userChoice.then(function (r) { if (r.outcome === 'accepted') btn.hidden = true; }).catch(function () {});
+    } else {
+      openHelp();
+    }
+  });
+
+  document.getElementById('installHelpClose').addEventListener('click', closeHelp);
+  overlay.addEventListener('click', function (e) { if (e.target === overlay) closeHelp(); });
+  document.addEventListener('keydown', function (e) { if (e.key === 'Escape') closeHelp(); });
+
+  var mq = window.matchMedia('(display-mode: standalone)');
+  if (mq.addEventListener) mq.addEventListener('change', refresh);
+  refresh();
+})();
 </script>
 </body>
 </html>
